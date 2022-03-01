@@ -1,0 +1,10 @@
+version: '2'
+services:
+
+  build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        Version: ${Version}
+    image: micahmitchell/fmdns:latest

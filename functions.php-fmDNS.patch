@@ -1,0 +1,27 @@
+--- facileManager-4.2.0/client/facileManager/fmDNS/functions.php	2022-01-06 09:49:52.000000000 -0600
++++ facileManager/client/facileManager/fmDNS/functions.php	2022-02-28 21:54:09.170754564 -0600
+@@ -328,7 +328,7 @@
+ 	$distros = array(
+ 		'bind9' => array(
+ 			'Arch'      => array('/etc/rc.d/named start', findProgram('systemctl') . ' start named.service'),
+-			'Debian'    => array('/etc/init.d/bind9 start', findProgram('systemctl') . ' start bind9.service'),
++			'Debian'    => array('/etc/init.d/bind9 start', '/etc/init.d/named start', findProgram('systemctl') . ' start bind9.service'),
+ 			'Redhat'    => array('/etc/init.d/named start', findProgram('systemctl') . ' start named.service', findProgram('systemctl') . ' start named-chroot.service'),
+ 			'SUSE'      => array('/etc/init.d/named start', findProgram('systemctl') . ' start named.service'),
+ 			'Gentoo'    => array('/etc/init.d/named start', findProgram('systemctl') . ' start named.service'),
+@@ -562,9 +562,13 @@
+ 	if (!is_array($rndc_actions)) $rndc_actions = array($rndc_actions);
+ 	
+ 	$rndc = findProgram('rndc');
+-	
++
++	if (file_exists('/etc/bind/named.conf.keys')) {
++	    $rndc_key = "-k /etc/bind/named.conf.keys";
++	}
++
+ 	foreach ($rndc_actions as $action) {
+-		$last_line = system("$rndc $action 2>&1", $retval);
++		$last_line = system("$rndc $rndc_key $action 2>&1", $retval);
+ 		if ($retval) {
+ 			return processReloadFailure($last_line);
+ 		}
